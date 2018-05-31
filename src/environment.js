@@ -24,7 +24,7 @@ import type { SourceFile, SourceMap, SourceType } from "./types.js";
 import {
   AbruptCompletion,
   Completion,
-  JoinedAbruptCompletions,
+  ForkedAbruptCompletion,
   PossiblyNormalCompletion,
   ThrowCompletion,
 } from "./completions.js";
@@ -1115,7 +1115,7 @@ export class LexicalEnvironment {
       return this.evaluate(ast, strictCode, metadata);
     } catch (err) {
       if (
-        (err instanceof JoinedAbruptCompletions || err instanceof PossiblyNormalCompletion) &&
+        (err instanceof ForkedAbruptCompletion || err instanceof PossiblyNormalCompletion) &&
         err.containsBreakOrContinue()
       ) {
         AbstractValue.reportIntrospectionError(err.joinCondition);

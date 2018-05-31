@@ -17,7 +17,7 @@ import {
   BreakCompletion,
   Completion,
   ContinueCompletion,
-  JoinedAbruptCompletions,
+  ForkedAbruptCompletion,
   PossiblyNormalCompletion,
   ReturnCompletion,
   ThrowCompletion,
@@ -158,7 +158,7 @@ function ForBodyEvaluation(
       realm.handleError(diagnostic);
       throw new FatalError();
     }
-    if (c instanceof PossiblyNormalCompletion || c instanceof JoinedAbruptCompletions) {
+    if (c instanceof PossiblyNormalCompletion || c instanceof ForkedAbruptCompletion) {
       failIfContainsBreakOrContinueCompletionWithNonLocalTarget(c.consequent);
       failIfContainsBreakOrContinueCompletionWithNonLocalTarget(c.alternate);
     }
@@ -174,7 +174,7 @@ function ForBodyEvaluation(
       }
       return false;
     }
-    if (c instanceof PossiblyNormalCompletion || c instanceof JoinedAbruptCompletions)
+    if (c instanceof PossiblyNormalCompletion || c instanceof ForkedAbruptCompletion)
       return containsContinueCompletion(c.consequent) || containsContinueCompletion(c.alternate);
     return false;
   }
@@ -194,7 +194,7 @@ function ForBodyEvaluation(
     invariant(abruptCompletion instanceof AbruptCompletion);
 
     // If there is now a single completion, we don't need to join
-    if (!(abruptCompletion instanceof JoinedAbruptCompletions)) return abruptCompletion;
+    if (!(abruptCompletion instanceof ForkedAbruptCompletion)) return abruptCompletion;
     invariant(containsContinueCompletion(abruptCompletion));
 
     // Apply the joined effects of continue completions to the current state since these now join the normal path
@@ -235,7 +235,7 @@ function ForBodyEvaluation(
 
     // If there is now a single completion, we don't need to join
     if (abruptCompletion instanceof BreakCompletion) return (UpdateEmpty(realm, abruptCompletion, V): any).value;
-    if (!(abruptCompletion instanceof JoinedAbruptCompletions)) throw abruptCompletion;
+    if (!(abruptCompletion instanceof ForkedAbruptCompletion)) throw abruptCompletion;
 
     // If there are no breaks, we don't need to join
     if (!abruptCompletion.containsCompletion(BreakCompletion)) throw abruptCompletion;
